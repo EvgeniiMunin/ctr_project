@@ -1,0 +1,42 @@
+input_data_path: "data/raw/sampled_train_5m.csv"
+output_model_path: "models/catclf.pkl"
+output_transformer_path: "models/transformer.pkl"
+metric_path: "models/metrics.json"
+splitting_params:
+  val_size: 0.2
+  random_state: 42
+train_params:
+  model_type: "CatBoost"
+  n_estimators: 100
+  learning_rate: 0.05
+  depth: 5
+  random_seed: 42
+  bagging_temperature: 0.2
+  random_state: 42
+feature_params:
+  features:
+    - 'site_id'
+    - 'site_domain'
+    - 'site_category'
+    - 'app_id'
+    - 'app_category'
+    - 'app_domain'
+    - 'device_model'
+    - 'device_type'
+    - 'device_conn_type'
+    - 'device_id_counts'
+    - 'device_ip_counts'
+    - 'banner_pos'
+    - 'C1'
+    - 'C14'
+    - 'C15'
+    - 'C16'
+    - 'C17'
+    - 'C18'
+    - 'C19'
+    - 'C20'
+    - 'C21'
+    - 'hour_of_day'
+    - 'day_of_week'
+    - 'hourly_user_count'
+  target_col: 'click'
