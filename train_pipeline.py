@@ -11,7 +11,8 @@ from src.entities.train_pipeline_params import (
     TrainingPipelineParams,
     read_training_pipeline_params,
 )
-
+from src.features.build_features import extract_target, process_features
+from src.models.model_fit_predict import train_model, predict_model, evaluate_model, serialize_model
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)
@@ -32,8 +33,37 @@ def train_pipeline(config_path: str):
     logger.info(f"train_df.shape is  {train_df.shape}")
     logger.info(f"val_df.shape is  {val_df.shape}")
 
-    # prepare train features
+
     transformer = build_transformer(training_pipeline_params.feature_params)
+    transformer.fit(train_df)
+
+    # prepare train features
+    train_features = process_features(transformer, train_df)
+    train_target = extract_target(train_df, training_pipeline_params.feature_params)
+    logger.info(f"train_features.shape is  {train_features.shape}")
+
+    # prepare val features
+    val_features = process_features(transformer, val_df)
+    val_target = extract_target(val_df, training_pipeline_params.feature_params)
+    logger.info(f"val_features.shape is  {val_features.shape}")
+
+    model = train_model(
+        train_features, train_target, training_pipeline_params.train_params
+    )
+
+    predicted_proba, preds = predict_model(model, val_features)
+    metrics = evaluate_model(predicted_proba, preds, val_target)
+    logger.debug(f"preds/ targets shapes:  {(preds.shape, val_target.shape)}")
+
+    # dump metrics to json
+    with open(training_pipeline_params.metric_path, "w") as metric_file:
+        json.dump(metrics, metric_file)
+    logger.info(f"Metric is {metrics}")
+
+    # serialize model
+    path_to_model = serialize_model(model, training_pipeline_params.output_model_path)
+
+    return path_to_model, metrics
 
 
 if __name__ == "__main__":

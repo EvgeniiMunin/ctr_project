@@ -82,6 +82,14 @@ class DataFrameSelector(BaseEstimator, TransformerMixin):
         return X
 
 
+def process_features(transformer: ColumnTransformer, df: pd.DataFrame) -> pd.DataFrame:
+    return pd.DataFrame(transformer.transform(df))
+
+
+def extract_target(df: pd.DataFrame, params: FeatureParams) -> pd.Series:
+    return df[params.target_col]
+
+
 if __name__ == "__main__":
     df = pd.DataFrame({
         "id": ["1111", "22222", "33333", "44444", "55555"],
