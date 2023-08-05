@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass()
 class TrainingParams:
+    model_type: str
     random_state: int = field(default=42)
     n_estimators: int = field(default=100)
     learning_rate: float = field(default=0.05)

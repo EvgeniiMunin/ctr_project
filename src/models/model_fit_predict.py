@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
-from sklearn.metrics import f1_score, log_loss, precision_score, recall_score
-from typing import Dict, Union
+from sklearn.metrics import f1_score, log_loss, precision_score, recall_score, roc_auc_score
+from typing import Dict, Union, Tuple
 import joblib
 
 from src.entities.train_params import TrainingParams
@@ -27,9 +27,9 @@ def train_model(
     return model
 
 
-def predict_model(model: CatBoostClassifier, features: pd.DataFrame) -> np.ndarray:
+def predict_model(model: CatBoostClassifier, features: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     """Predict model from configs"""
-    predicted_proba = catclf.predict_proba(features)
+    predicted_proba = model.predict_proba(features)
     preds = np.argmax(predicted_proba, axis=1)
     return predicted_proba, preds
 
@@ -44,7 +44,8 @@ def evaluate_model(
         "f1_score": f1_score(target, predicts, average="weighted"),
         "log_loss": log_loss(target, predicted_proba),
         "precision": precision_score(target, predicts),
-        "recall": recall_score(target, predicts)
+        "recall": recall_score(target, predicts),
+        "roc_auc_score": roc_auc_score(target, predicted_proba[:, 1])
     }
 
 

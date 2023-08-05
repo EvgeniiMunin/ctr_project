@@ -7,12 +7,11 @@ splitting_params:
   random_state: 42
 train_params:
   model_type: "CatBoost"
+  random_state: 42
   n_estimators: 100
   learning_rate: 0.05
   depth: 5
-  random_seed: 42
   bagging_temperature: 0.2
-  random_state: 42
 feature_params:
   features:
     - 'site_id'

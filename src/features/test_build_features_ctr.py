@@ -76,17 +76,10 @@ if __name__ == "__main__":
     print("df.nunique: \n", df.nunique())
 
     feature_names = [
-        'site_id', # OK
-        'site_domain',
-        'site_category',
-        'app_id',
-        'app_category',
-        'app_domain',
+        'site_id', 'site_domain', 'site_category', 'app_id', 'app_category', 'app_domain',
         'device_model', 'device_type', 'device_conn_type', 'device_id_counts', 'device_ip_counts',
         'banner_pos', 'C1', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
-        'hour_of_day',
-        'day_of_week',
-        'hourly_user_count'
+        'hour_of_day', 'day_of_week', 'hourly_user_count'
     ]
 
     #feature_names = [
