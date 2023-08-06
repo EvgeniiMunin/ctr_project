@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import logging
 import sys
@@ -15,7 +16,9 @@ logger.addHandler(handler)
 
 @pytest.fixture()
 def dataset_path():
-    return "sampled_data_unit_test.csv"
+    curdir = os.path.dirname(__file__)
+    logger.info(curdir)
+    return os.path.join(curdir, "sampled_data_unit_test.csv")
 
 
 @pytest.fixture()
