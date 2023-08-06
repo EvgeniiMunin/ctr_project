@@ -4,7 +4,6 @@ import logging
 import sys
 import pandas as pd
 import pytest
-from py._path.local import LocalPath
 from catboost import CatBoostClassifier
 from datetime import datetime
 
@@ -58,7 +57,7 @@ def test_train_model(dataset: pd.DataFrame):
     assert model.predict(train_features).shape[0] == train_target.shape[0]
 
 
-def test_serialization_model(tmpdir: LocalPath):
+def test_serialization_model(tmpdir):
     expected_output = tmpdir.join("model.pkl")
     model = CatBoostClassifier()
     real_output = serialize_model(model, expected_output)
