@@ -26,7 +26,7 @@ logger.addHandler(handler)
 
 @pytest.fixture()
 def dataset() -> pd.DataFrame:
-    return read_data("tests/sampled_train_50k.csv")
+    return read_data("sampled_train_50k.csv")
 
 
 @pytest.fixture()

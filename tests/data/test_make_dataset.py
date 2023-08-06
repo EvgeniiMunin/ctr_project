@@ -15,7 +15,7 @@ logger.addHandler(handler)
 
 @pytest.fixture()
 def dataset_path():
-    return "tests/sampled_data_unit_test.csv"
+    return "sampled_data_unit_test.csv"
 
 
 @pytest.fixture()
