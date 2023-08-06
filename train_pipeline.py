@@ -12,9 +12,18 @@ from src.entities.train_pipeline_params import (
     TrainingPipelineParams,
     read_training_pipeline_params,
 )
-from src.features.build_transformer import build_ctr_transformer, build_transformer, extract_target, \
-    process_count_features
-from src.models.model_fit_predict import train_model, predict_model, evaluate_model, serialize_model
+from src.features.build_transformer import (
+    build_ctr_transformer,
+    build_transformer,
+    extract_target,
+    process_count_features,
+)
+from src.models.model_fit_predict import (
+    train_model,
+    predict_model,
+    evaluate_model,
+    serialize_model,
+)
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)
@@ -23,19 +32,28 @@ logger.addHandler(handler)
 
 
 def train_pipeline(config_path: str):
-    training_pipeline_params: TrainingPipelineParams = read_training_pipeline_params(config_path)
+    training_pipeline_params: TrainingPipelineParams = read_training_pipeline_params(
+        config_path
+    )
 
     data: pd.DataFrame = read_data(training_pipeline_params.input_data_path)
-    data['hour'] = data.hour.apply(lambda val: datetime.strptime(str(val), '%y%m%d%H'))
+    data["hour"] = data.hour.apply(lambda val: datetime.strptime(str(val), "%y%m%d%H"))
     logger.info(f"Start train pipeline with params {training_pipeline_params}")
-    logger.info(
-        f"data:  {data.shape} \n {data.info()} \n {data.nunique()}")
+    logger.info(f"data:  {data.shape} \n {data.info()} \n {data.nunique()}")
 
     transformer = build_transformer(training_pipeline_params.feature_params)
     processed_data = process_count_features(transformer, data)
-    count_features = ["device_ip_count", "device_id_count", "hour_of_day", "day_of_week", "hourly_user_count"]
+    count_features = [
+        "device_ip_count",
+        "device_id_count",
+        "hour_of_day",
+        "day_of_week",
+        "hourly_user_count",
+    ]
     logger.info(
-        f"processed_data:  {processed_data.shape} \n {processed_data.info()} \n {processed_data.nunique()} \n {processed_data[count_features]}")
+        f"processed_data:  {processed_data.shape} \n {processed_data.info()} "
+        f"\n {processed_data.nunique()} \n {processed_data[count_features]}"
+    )
 
     train_df, val_df = split_train_val_data(
         processed_data, training_pipeline_params.splitting_params
@@ -44,8 +62,8 @@ def train_pipeline(config_path: str):
     logger.info(f"val_df.shape is  {val_df.shape}")
 
     # check distributions of targets between train and test
-    print("train trg: \n", train_df['click'].value_counts() / train_df.shape[0])
-    print("test trg: \n", val_df['click'].value_counts() / val_df.shape[0])
+    print("train trg: \n", train_df["click"].value_counts() / train_df.shape[0])
+    print("test trg: \n", val_df["click"].value_counts() / val_df.shape[0])
 
     ctr_transformer = build_ctr_transformer(training_pipeline_params.feature_params)
     ctr_transformer.fit(train_df)
@@ -54,12 +72,16 @@ def train_pipeline(config_path: str):
     # prepare train features
     train_features = ctr_transformer.transform(train_df)
     train_target = extract_target(train_df, training_pipeline_params.feature_params)
-    logger.info(f"train_features:  {train_features.shape} \n {train_features.info()} \n {train_features.nunique()}")
+    logger.info(
+        f"train_features:  {train_features.shape} \n {train_features.info()} \n {train_features.nunique()}"
+    )
 
     # prepare val features
     val_features = ctr_transformer.transform(val_df)
     val_target = extract_target(val_df, training_pipeline_params.feature_params)
-    logger.info(f"val_features:  {val_features.shape} \n {val_features.info()} \n {val_features.nunique()}") # OK
+    logger.info(
+        f"val_features:  {val_features.shape} \n {val_features.info()} \n {val_features.nunique()}"
+    )  # OK
 
     model = train_model(
         train_features, train_target, training_pipeline_params.train_params
@@ -82,8 +104,6 @@ def train_pipeline(config_path: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config", default="configs/train_config.yaml"
-    )
+    parser.add_argument("--config", default="configs/train_config.yaml")
     args = parser.parse_args()
     train_pipeline(args.config)

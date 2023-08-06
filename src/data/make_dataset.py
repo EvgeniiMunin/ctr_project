@@ -19,7 +19,7 @@ def split_train_val_data(
     return train_data, val_data
 
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    #df = pd.read_csv("data/sampled_preprocessed_train_5m.csv")
 #    df = pd.read_csv("data/raw/sampled_train_5m.csv")
 #

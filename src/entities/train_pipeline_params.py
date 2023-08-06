@@ -10,7 +10,6 @@ from src.entities.feature_params import FeatureParams
 from src.entities.train_params import TrainingParams
 
 
-
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.INFO)

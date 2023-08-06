@@ -1,7 +1,13 @@
 import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
-from sklearn.metrics import f1_score, log_loss, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import (
+    f1_score,
+    log_loss,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from typing import Dict, Union, Tuple
 import joblib
 
@@ -27,7 +33,9 @@ def train_model(
     return model
 
 
-def predict_model(model: CatBoostClassifier, features: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
+def predict_model(
+    model: CatBoostClassifier, features: pd.DataFrame
+) -> Tuple[np.ndarray, np.ndarray]:
     """Predict model from configs"""
     predicted_proba = model.predict_proba(features)
     preds = np.argmax(predicted_proba, axis=1)
@@ -35,9 +43,7 @@ def predict_model(model: CatBoostClassifier, features: pd.DataFrame) -> Tuple[np
 
 
 def evaluate_model(
-    predicted_proba: np.ndarray,
-    predicts: np.ndarray,
-    target: pd.Series
+    predicted_proba: np.ndarray, predicts: np.ndarray, target: pd.Series
 ) -> Dict[str, float]:
     """Evaluate model from configs"""
     return {
@@ -45,7 +51,7 @@ def evaluate_model(
         "log_loss": log_loss(target, predicted_proba),
         "precision": precision_score(target, predicts),
         "recall": recall_score(target, predicts),
-        "roc_auc_score": roc_auc_score(target, predicted_proba[:, 1])
+        "roc_auc_score": roc_auc_score(target, predicted_proba[:, 1]),
     }
 
 

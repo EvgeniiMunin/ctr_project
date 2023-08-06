@@ -19,13 +19,15 @@ class DeviceCountTransformer(BaseEstimator, TransformerMixin):
 
     def fit(self, X: pd.DataFrame, y=None):
         # count the number of ads per unique user ( device ip )
-        data_group = X[[self.column_name, 'id']].groupby([self.column_name]).count()
+        data_group = X[[self.column_name, "id"]].groupby([self.column_name]).count()
 
         # make a column with values with device id counts
         for index in tqdm(X[self.column_name]):
-            self.device_count_feature.append(data_group['id'][index])
+            self.device_count_feature.append(data_group["id"][index])
 
         return self
 
     def transform(self, X: pd.DataFrame):
-        return pd.DataFrame(self.device_count_feature, columns=[f"{self.column_name}_count"])
+        return pd.DataFrame(
+            self.device_count_feature, columns=[f"{self.column_name}_count"]
+        )

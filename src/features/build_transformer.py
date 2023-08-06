@@ -18,18 +18,28 @@ logger.addHandler(handler)
 
 def build_transformer(params: FeatureParams) -> Pipeline:
     time_transformer = FunctionTransformer(
-        lambda df: pd.DataFrame({
-            "hour_of_day": df["hour"].dt.hour,
-            "day_of_week": df["hour"].dt.dayofweek,
-            "device_ip": df["device_ip"],
-            "device_id": df["device_id"]
-        })
+        lambda df: pd.DataFrame(
+            {
+                "hour_of_day": df["hour"].dt.hour,
+                "day_of_week": df["hour"].dt.dayofweek,
+                "device_ip": df["device_ip"],
+                "device_id": df["device_id"],
+            }
+        )
     )
 
     device_time_transformer = ColumnTransformer(
         transformers=[
-            ("device_ip_count", DeviceCountTransformer("device_ip"), ["id", "hour", "device_ip", "device_id"]),
-            ("device_id_count", DeviceCountTransformer("device_id"), ["id", "hour", "device_ip", "device_id"]),
+            (
+                "device_ip_count",
+                DeviceCountTransformer("device_ip"),
+                ["id", "hour", "device_ip", "device_id"],
+            ),
+            (
+                "device_id_count",
+                DeviceCountTransformer("device_id"),
+                ["id", "hour", "device_ip", "device_id"],
+            ),
             ("time_transformer", time_transformer, ["hour", "device_ip", "device_id"]),
         ],
     )
@@ -49,10 +59,30 @@ def build_transformer(params: FeatureParams) -> Pipeline:
 
 def build_ctr_transformer(params: FeatureParams) -> CtrTransformer:
     feature_names = [
-        'site_id', 'site_domain', 'site_category', 'app_id', 'app_category', 'app_domain',
-        'device_model', 'device_type', 'device_conn_type', 'device_id_count', 'device_ip_count',
-        'banner_pos', 'C1', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
-        'hour_of_day', 'day_of_week', 'hourly_user_count'
+        "site_id",
+        "site_domain",
+        "site_category",
+        "app_id",
+        "app_category",
+        "app_domain",
+        "device_model",
+        "device_type",
+        "device_conn_type",
+        "device_id_count",
+        "device_ip_count",
+        "banner_pos",
+        "C1",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "hour_of_day",
+        "day_of_week",
+        "hourly_user_count",
     ]
     ctr_transformer = CtrTransformer(feature_names)
     logger.info(f"ctr_transformer: \n {ctr_transformer}")
@@ -61,11 +91,15 @@ def build_ctr_transformer(params: FeatureParams) -> CtrTransformer:
 
 
 def process_count_features(
-    transformer: Pipeline,
-    df: pd.DataFrame,
-    params: FeatureParams = None,
+    transformer: Pipeline, df: pd.DataFrame, params: FeatureParams = None,
 ) -> pd.DataFrame:
-    count_features = ["device_ip_count", "device_id_count", "hour_of_day", "day_of_week", "hourly_user_count"]
+    count_features = [
+        "device_ip_count",
+        "device_id_count",
+        "hour_of_day",
+        "day_of_week",
+        "hourly_user_count",
+    ]
     transdf = transformer.fit_transform(df)
     return pd.concat([df, transdf[count_features]], axis=1)
 

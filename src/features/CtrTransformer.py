@@ -18,14 +18,14 @@ class CtrTransformer(BaseEstimator, TransformerMixin):
         self.feats = feats
 
     def _response_fit(self, data, feature_name):
-        df_vocab = data.groupby([feature_name, 'click']).size().unstack()
-        df_vocab['ctr'] = df_vocab[1] / (df_vocab[0] + df_vocab[1])
+        df_vocab = data.groupby([feature_name, "click"]).size().unstack()
+        df_vocab["ctr"] = df_vocab[1] / (df_vocab[0] + df_vocab[1])
 
         df_vocab.dropna(inplace=True)
-        mean_ctr = df_vocab['ctr'].mean()
+        mean_ctr = df_vocab["ctr"].mean()
 
         keys = list(df_vocab.index)
-        values = list(df_vocab['ctr'].values)
+        values = list(df_vocab["ctr"].values)
         vocab = {keys[i]: values[i] for i in range(len(keys))}
 
         return vocab, mean_ctr
