@@ -2,16 +2,13 @@ import sys
 import pandas as pd
 import logging
 import numpy as np
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from src.entities.feature_params import FeatureParams
 from tqdm.notebook import tqdm
-
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from src.entities.feature_params import FeatureParams
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)

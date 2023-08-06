@@ -2,7 +2,7 @@ import json
 import logging
 import sys
 import argparse
-from  datetime import datetime
+from datetime import datetime
 
 import pandas as pd
 
