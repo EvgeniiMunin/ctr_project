@@ -14,18 +14,6 @@ logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 
-@pytest.fixture()
-def dataset_path():
-    curdir = os.path.dirname(__file__)
-    logger.info(curdir)
-    return os.path.join(curdir, "sampled_data_unit_test.csv")
-
-
-@pytest.fixture()
-def target_col():
-    return "click"
-
-
 def test_load_dataset(dataset_path: str, target_col: str):
     print("dataset_path: ", dataset_path)
     data = read_data(dataset_path)

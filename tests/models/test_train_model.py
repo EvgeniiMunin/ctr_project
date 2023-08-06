@@ -2,7 +2,6 @@ import os
 import joblib
 import logging
 import sys
-import pandas as pd
 import pytest
 from catboost import CatBoostClassifier
 from datetime import datetime
