@@ -14,7 +14,7 @@ logger.addHandler(handler)
 def dataset_path():
     curdir = os.path.dirname(__file__)
     logger.info(curdir)
-    return os.path.join(curdir, "sampled_data_unit_test.csv")
+    return os.path.join(curdir, "sampled_train_50k.csv")
 
 
 @pytest.fixture()
