@@ -2,6 +2,14 @@
 -e .
 
 # external requirements
+numpy==1.19.5
+scikit-learn==0.24.1
+pandas==1.1.5
+pytest==7.4.0
+catboost==0.26
+marshmallow-dataclass==8.5.8
+marshmallow==3.17.0
+
 click
 Sphinx
 coverage
