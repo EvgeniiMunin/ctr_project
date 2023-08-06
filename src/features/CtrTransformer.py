@@ -1,7 +1,6 @@
 import sys
 import pandas as pd
 import logging
-from tqdm.notebook import tqdm
 
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -37,7 +36,7 @@ class CtrTransformer(BaseEstimator, TransformerMixin):
         return vector
 
     def fit(self, X: pd.DataFrame, y=None):
-        for name in tqdm(self.feats):
+        for name in self.feats:
             vocab_feat, mean_ctr_feat = self._response_fit(X, name)
             self.vocab[name] = vocab_feat
             self.mean_ctr[name] = mean_ctr_feat
@@ -45,6 +44,6 @@ class CtrTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X: pd.DataFrame):
         self.xpctr = pd.DataFrame()
-        for name in tqdm(self.feats):
+        for name in self.feats:
             self.xpctr[name] = self._response_transform(X[name], name)
         return self.xpctr

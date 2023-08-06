@@ -1,7 +1,6 @@
 import sys
 import pandas as pd
 import logging
-from tqdm.notebook import tqdm
 
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -22,7 +21,7 @@ class DeviceCountTransformer(BaseEstimator, TransformerMixin):
         data_group = X[[self.column_name, "id"]].groupby([self.column_name]).count()
 
         # make a column with values with device id counts
-        for index in tqdm(X[self.column_name]):
+        for index in X[self.column_name]:
             self.device_count_feature.append(data_group["id"][index])
 
         return self
