@@ -17,14 +17,3 @@ def split_train_val_data(
     )
 
     return train_data, val_data
-
-
-# if __name__ == "__main__":
-#    #df = pd.read_csv("data/sampled_preprocessed_train_5m.csv")
-#    df = pd.read_csv("data/raw/sampled_train_5m.csv")
-#
-#    dfsample = df.sample(frac=0.01)
-#    print("dfsample: ", dfsample.shape, "\n", dfsample.info())
-#
-#    #dfsample.to_csv("data/sampled_preprocessed_train_50k.csv")
-#    dfsample.to_csv("data/raw/sampled_train_50k.csv")

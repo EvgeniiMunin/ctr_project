@@ -13,29 +13,35 @@ train_params:
   depth: 5
   bagging_temperature: 0.2
 feature_params:
-  features:
-    - 'site_id'
-    - 'site_domain'
-    - 'site_category'
-    - 'app_id'
-    - 'app_category'
-    - 'app_domain'
-    - 'device_model'
-    - 'device_type'
-    - 'device_conn_type'
-    - 'device_id_counts'
-    - 'device_ip_counts'
-    - 'banner_pos'
-    - 'C1'
-    - 'C14'
-    - 'C15'
-    - 'C16'
-    - 'C17'
-    - 'C18'
-    - 'C19'
-    - 'C20'
-    - 'C21'
-    - 'hour_of_day'
-    - 'day_of_week'
-    - 'hourly_user_count'
+  count_features:
+    - "device_ip_count"
+    - "device_id_count"
+    - "hour_of_day"
+    - "day_of_week"
+    - "hourly_user_count"
+  ctr_features:
+    - "site_id"
+    - "site_domain"
+    - "site_category"
+    - "app_id"
+    - "app_category"
+    - "app_domain"
+    - "device_model"
+    - "device_type"
+    - "device_conn_type"
+    - "device_id_count"
+    - "device_ip_count"
+    - "banner_pos"
+    - "C1"
+    - "C14"
+    - "C15"
+    - "C16"
+    - "C17"
+    - "C18"
+    - "C19"
+    - "C20"
+    - "C21"
+    - "hour_of_day"
+    - "day_of_week"
+    - "hourly_user_count"
   target_col: 'click'
