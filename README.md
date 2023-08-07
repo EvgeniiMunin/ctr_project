@@ -1,9 +1,24 @@
 ctr_project
 ==============================
 
-ctr prediction
+### Установка 
+~~~
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+~~~
 
-Project Organization
+### Обучение модели
+~~~
+python ctr_project/train_pipeline.py configs/train_config.yaml
+~~~
+
+### Run unit tests:
+~~~
+pytest
+~~~
+
+### Организация проекта
 ------------
 
     ├── LICENSE

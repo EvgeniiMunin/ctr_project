@@ -31,7 +31,7 @@ class UserCountTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         res_arr = np.array(self.user_count_feature).reshape(-1, 1)
-        resdf = pd.DataFrame(
+        count_df = pd.DataFrame(
             X,
             columns=[
                 "device_ip_count",
@@ -42,5 +42,5 @@ class UserCountTransformer(BaseEstimator, TransformerMixin):
                 "device_id",
             ],
         )
-        resdf["hourly_user_count"] = res_arr
-        return resdf
+        count_df["hourly_user_count"] = res_arr
+        return count_df

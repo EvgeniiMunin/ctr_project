@@ -11,10 +11,11 @@ logger.setLevel(logging.INFO)
 
 
 class CtrTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, feats: list = None):
+    def __init__(self, features: list = None):
+        self.ctr_df = None
         self.mean_ctr = dict()
         self.vocab = dict()
-        self.feats = feats
+        self.features = features
 
     def _response_fit(self, data, feature_name):
         df_vocab = data.groupby([feature_name, "click"]).size().unstack()
@@ -36,14 +37,16 @@ class CtrTransformer(BaseEstimator, TransformerMixin):
         return vector
 
     def fit(self, X: pd.DataFrame, y=None):
-        for name in self.feats:
-            vocab_feat, mean_ctr_feat = self._response_fit(X, name)
-            self.vocab[name] = vocab_feat
-            self.mean_ctr[name] = mean_ctr_feat
+        for column_name in self.features:
+            vocab_feat, mean_ctr_feat = self._response_fit(X, column_name)
+            self.vocab[column_name] = vocab_feat
+            self.mean_ctr[column_name] = mean_ctr_feat
         return self
 
     def transform(self, X: pd.DataFrame):
-        self.xpctr = pd.DataFrame()
-        for name in self.feats:
-            self.xpctr[name] = self._response_transform(X[name], name)
-        return self.xpctr
+        self.ctr_df = pd.DataFrame()
+        for column_name in self.features:
+            self.ctr_df[column_name] = self._response_transform(
+                X[column_name], column_name
+            )
+        return self.ctr_df

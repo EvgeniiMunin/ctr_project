@@ -24,23 +24,68 @@ logger.addHandler(handler)
 
 
 @pytest.fixture()
-def target_col():
+def count_features() -> list:
+    return [
+        "device_ip_count",
+        "device_id_count",
+        "hour_of_day",
+        "day_of_week",
+        "hourly_user_count",
+    ]
+
+
+@pytest.fixture()
+def ctr_features() -> list:
+    return [
+        "site_id",
+        "site_domain",
+        "site_category",
+        "app_id",
+        "app_category",
+        "app_domain",
+        "device_model",
+        "device_type",
+        "device_conn_type",
+        "device_id_count",
+        "device_ip_count",
+        "banner_pos",
+        "C1",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20",
+        "C21",
+        "hour_of_day",
+        "day_of_week",
+        "hourly_user_count",
+    ]
+
+
+@pytest.fixture()
+def target_col() -> str:
     return "click"
 
 
-def test_train_model(dataset_path: str):
+def test_train_model(
+    dataset_path: str, count_features: list, ctr_features: list, target_col: str
+):
     print("dataset_path: ", dataset_path)
     dataset = read_data(dataset_path)
 
     dataset["hour"] = dataset.hour.apply(
         lambda val: datetime.strptime(str(val), "%y%m%d%H")
     )
-    feature_params = FeatureParams(["1", "2"], "click")
+    feature_params = FeatureParams(
+        count_features=count_features, ctr_features=ctr_features, target_col=target_col
+    )
 
-    transformer = build_transformer(feature_params)
+    transformer = build_transformer()
     ctr_transformer = build_ctr_transformer(feature_params)
 
-    processed_data = process_count_features(transformer, dataset)
+    processed_data = process_count_features(transformer, dataset, feature_params)
     logger.info(
         f"processed_data:  {processed_data.shape} \n {processed_data.info()} \n {processed_data.nunique()}"
     )

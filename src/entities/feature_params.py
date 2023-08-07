@@ -4,5 +4,6 @@ from typing import List
 
 @dataclass()
 class FeatureParams:
-    features: List[str]
+    count_features: List[str]
+    ctr_features: List[str]
     target_col: str = field(default="target")

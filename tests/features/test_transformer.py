@@ -59,12 +59,12 @@ def device_transformer() -> ColumnTransformer:
                 "device_ip_count",
                 DeviceCountTransformer("device_ip"),
                 ["id", "hour", "device_ip", "device_id"],
-            ),  # OK
+            ),
             (
                 "device_id_count",
                 DeviceCountTransformer("device_id"),
                 ["id", "hour", "device_ip", "device_id"],
-            ),  # OK
+            ),
         ]
     )
 
@@ -78,17 +78,13 @@ def user_device_transformer(time_transformer: FunctionTransformer) -> Pipeline:
                 "device_ip_count",
                 DeviceCountTransformer("device_ip"),
                 ["id", "hour", "device_ip", "device_id"],
-            ),  # OK
+            ),
             (
                 "device_id_count",
                 DeviceCountTransformer("device_id"),
                 ["id", "hour", "device_ip", "device_id"],
-            ),  # OK
-            (
-                "time_transformer",
-                time_transformer,
-                ["hour", "device_ip", "device_id"],
-            ),  # OK
+            ),
+            ("time_transformer", time_transformer, ["hour", "device_ip", "device_id"],),
         ],
     )
     return Pipeline(
@@ -101,7 +97,7 @@ def user_device_transformer(time_transformer: FunctionTransformer) -> Pipeline:
 
 def test_time_transformer(
     synthetic_dataset: pd.DataFrame, time_transformer: FunctionTransformer
-):  # OK
+):
     expected_hour = [12, 13, 14, 9, 10]
     expected_day = [3, 3, 3, 4, 4]
     timedf = time_transformer.fit_transform(synthetic_dataset)
@@ -113,7 +109,7 @@ def test_time_transformer(
 
 def test_device_transformer(
     synthetic_dataset: pd.DataFrame, device_transformer: DeviceCountTransformer
-):  # OK
+):
     expected_device_ip_count = [2, 2, 2, 1, 2]
     expected_device_id_count = [2, 2, 2, 1, 2]
     devicedf = device_transformer.fit_transform(synthetic_dataset)

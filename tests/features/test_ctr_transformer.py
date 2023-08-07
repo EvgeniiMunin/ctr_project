@@ -29,7 +29,7 @@ def ctr_transformer(synthetic_dataset: Tuple[pd.DataFrame, list]) -> CtrTransfor
 
 def test_time_transformer(
     synthetic_dataset: Tuple[pd.DataFrame, list], ctr_transformer: CtrTransformer
-):  # OK
+):
     expected_processed_ctr = [0.58, 0.67, 0.5, 0.5, 0.67, 0.67]
 
     ctrdf = ctr_transformer.fit_transform(synthetic_dataset[0])

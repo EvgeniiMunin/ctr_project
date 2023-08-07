@@ -41,18 +41,13 @@ def train_pipeline(config_path: str):
     logger.info(f"Start train pipeline with params {training_pipeline_params}")
     logger.info(f"data:  {data.shape} \n {data.info()} \n {data.nunique()}")
 
-    transformer = build_transformer(training_pipeline_params.feature_params)
-    processed_data = process_count_features(transformer, data)
-    count_features = [
-        "device_ip_count",
-        "device_id_count",
-        "hour_of_day",
-        "day_of_week",
-        "hourly_user_count",
-    ]
+    transformer = build_transformer()
+    processed_data = process_count_features(
+        transformer, data, training_pipeline_params.feature_params
+    )
     logger.info(
         f"processed_data:  {processed_data.shape} \n {processed_data.info()} "
-        f"\n {processed_data.nunique()} \n {processed_data[count_features]}"
+        f"\n {processed_data.nunique()} \n {processed_data[training_pipeline_params.feature_params.count_features]}"
     )
 
     train_df, val_df = split_train_val_data(
@@ -62,8 +57,8 @@ def train_pipeline(config_path: str):
     logger.info(f"val_df.shape is  {val_df.shape}")
 
     # check distributions of targets between train and test
-    print("train trg: \n", train_df["click"].value_counts() / train_df.shape[0])
-    print("test trg: \n", val_df["click"].value_counts() / val_df.shape[0])
+    logger.info(f"train trg: \n {train_df['click'].value_counts() / train_df.shape[0]}")
+    logger.info(f"test trg: \n {val_df['click'].value_counts() / val_df.shape[0]}")
 
     ctr_transformer = build_ctr_transformer(training_pipeline_params.feature_params)
     ctr_transformer.fit(train_df)
@@ -81,7 +76,7 @@ def train_pipeline(config_path: str):
     val_target = extract_target(val_df, training_pipeline_params.feature_params)
     logger.info(
         f"val_features:  {val_features.shape} \n {val_features.info()} \n {val_features.nunique()}"
-    )  # OK
+    )
 
     model = train_model(
         train_features, train_target, training_pipeline_params.train_params
