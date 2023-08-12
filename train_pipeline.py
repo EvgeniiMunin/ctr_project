@@ -79,14 +79,24 @@ def train_pipeline(config_path: str):
         f"val_features:  {val_features.shape} \n {val_features.info()} \n {val_features.nunique()}"
     )
 
-    log_experiment_mlflow(
-        run_name="ctr_run_5m_150estim",
+    model, metrics = log_experiment_mlflow(
+        run_name="ctr_run_50k_150estim",
         train_features=train_features,
         train_target=train_target,
         val_features=val_features,
         val_target=val_target,
-        train_params=training_pipeline_params.train_params,
+        training_pipeline_params=training_pipeline_params,
     )
+
+    # dump metrics to json
+    with open(training_pipeline_params.metric_path, "w") as metric_file:
+        json.dump(metrics, metric_file)
+    logger.info(f"Metric is {metrics}")
+
+    # serialize model
+    path_to_model = serialize_model(model, training_pipeline_params.output_model_path)
+
+    return path_to_model, metrics
 
 
 if __name__ == "__main__":

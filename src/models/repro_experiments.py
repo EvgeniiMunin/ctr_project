@@ -1,11 +1,16 @@
 import logging
 import sys
+from typing import Tuple
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import mlflow
 import shap
 from dataclasses import asdict
 
+from catboost import CatBoostClassifier
+
+from src.entities.train_pipeline_params import TrainingPipelineParams
 from src.models.model_fit_predict import train_model, evaluate_model, predict_model
 
 logger = logging.getLogger(__name__)
@@ -31,15 +36,20 @@ def interpret_features(model, val_features):
 
 
 def log_experiment_mlflow(
-    run_name, train_features, train_target, val_features, val_target, train_params
-):
+    run_name: str,
+    train_features: pd.DataFrame,
+    train_target: pd.Series,
+    val_features: pd.DataFrame,
+    val_target: pd.Series,
+    training_pipeline_params: TrainingPipelineParams
+) -> Tuple[CatBoostClassifier, dict]:
     mlflow.set_tracking_uri("http://127.0.0.1:5000/")
     mlflow.set_experiment("demo2")
 
     with mlflow.start_run(run_name="RUN_{}".format(run_name)) as run:
         logger.info("run_id: {}; status: {}".format(run.info.run_id, run.info.status))
 
-        model = train_model(train_features, train_target, train_params)
+        model = train_model(train_features, train_target, training_pipeline_params.train_params)
 
         predicted_proba, preds = predict_model(model, val_features)
         metrics = evaluate_model(predicted_proba, preds, val_target)
@@ -50,10 +60,14 @@ def log_experiment_mlflow(
         mlflow.log_metric(key="recall", value=metrics["recall"])
 
         # convert train_params to dict
-        train_params_dict = asdict(train_params)
+        train_params_dict = asdict(training_pipeline_params.train_params)
         mlflow.log_params(train_params_dict)
+        mlflow.log_param(key="input_data_path", value=training_pipeline_params.input_data_path)
 
         interpret_features(model, val_features)
 
         mlflow.log_artifact(local_path="artifacts/shap.png")
+        mlflow.log_artifact(local_path="dvc.lock")
         mlflow.sklearn.log_model(model, "model_saved")
+
+    return model, metrics
