@@ -41,7 +41,7 @@ def log_experiment_mlflow(
     train_target: pd.Series,
     val_features: pd.DataFrame,
     val_target: pd.Series,
-    training_pipeline_params: TrainingPipelineParams
+    training_pipeline_params: TrainingPipelineParams,
 ) -> Tuple[CatBoostClassifier, dict]:
     mlflow.set_tracking_uri("http://127.0.0.1:5000/")
     mlflow.set_experiment("demo2")
@@ -49,7 +49,9 @@ def log_experiment_mlflow(
     with mlflow.start_run(run_name="RUN_{}".format(run_name)) as run:
         logger.info("run_id: {}; status: {}".format(run.info.run_id, run.info.status))
 
-        model = train_model(train_features, train_target, training_pipeline_params.train_params)
+        model = train_model(
+            train_features, train_target, training_pipeline_params.train_params
+        )
 
         predicted_proba, preds = predict_model(model, val_features)
         metrics = evaluate_model(predicted_proba, preds, val_target)
@@ -62,7 +64,9 @@ def log_experiment_mlflow(
         # convert train_params to dict
         train_params_dict = asdict(training_pipeline_params.train_params)
         mlflow.log_params(train_params_dict)
-        mlflow.log_param(key="input_data_path", value=training_pipeline_params.input_data_path)
+        mlflow.log_param(
+            key="input_data_path", value=training_pipeline_params.input_data_path
+        )
 
         interpret_features(model, val_features)
 
