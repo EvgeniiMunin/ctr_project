@@ -10,7 +10,7 @@ train_params:
   random_state: 42
   n_estimators: 50
   learning_rate: 0.05
-  depth: 10
+  depth: 5
   bagging_temperature: 0.2
 feature_params:
   count_features:
