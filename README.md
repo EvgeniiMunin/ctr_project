@@ -9,6 +9,7 @@ ctr_project
 За основу возьмем данные соревнования Kaggle [Avazu CTR Prediction](https://www.kaggle.com/competitions/avazu-ctr-prediction/overview/description).
 
 
+## Sem1. ML Pipeline
 ### Описание пайплайна
 Пайплайн с моделью состоит из трех основных элементов
 - `make_dataset`: чтения данных
@@ -24,25 +25,117 @@ ctr_project
 
 
 ### Установка 
-~~~
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-~~~
+```
 
 ### Обучение модели
-~~~
-python ctr_project/train_pipeline.py configs/train_config.yaml
-~~~
+```bash
+python ctr_project/train_pipeline.py --configs configs/train_config.yaml
+```
 
 ### Юнит тестирование:
-~~~
+```bash
 pytest
-~~~
+```
 
-### Организация проекта
-------------
+### Результаты
+Наш пайплайн будет достаточно прямолинейным и будет содержать элементы описанные ранее.
+Кастомные обработки фичей обернуты в формат `sklearn transformer` для единооборазия.
 
+![img_5.png](img_5.png)
+
+
+## Sem2. Reproducibility
+В этом занятии мы затроним вопрос воспроизводимости экспериментов в ML. Рассмотрим 2 инструмента воспроизводимости экспериментов над моделями:
+- [DVC](https://dvc.org/) : для версионирования данных и артефактов при помощи Git синтаксиса
+- [MLFlow](https://mlflow.org/): для логирования экспериментов над моделью.
+
+Также поднимем удаленное S3 объектное хранилище в VK Cloud.
+
+### Установка 
+```bash
+pip install dvc
+pip install mlflow
+```
+
+### Основные команды
+В процессе занятия нам потребуются следующие команды для настройка MLFLow UI и DVC и
+добавления данных в удаленное хранилище.
+```bash
+mlflow ui
+
+# setup DVC
+dvc init
+dvc add data/raw/sampled_train_5m.csv
+dvc add data/raw/sampled_train_50k.csv
+
+# create and setup remote
+dvc remote add s3 s3://sem3-repro/ctr-project-train/
+dvc remote modify s3 endpointurl https://hb.ru-msk.vkcs.cloud 
+dvc remote modify s3 region ru-msk
+
+# push/ pull to remote
+dvc push -r s3
+dvc pull -r s3
+
+dvc repro
+```
+
+### Результаты
+После прогона пайплайн у нас должна залогироваться их история в списке экспериметнов.
+![img.png](img.png)
+
+В каждом эксперименте будет записан свой список метрик, параметров модели и артефактов.
+![img_1.png](img_1.png)
+
+Мы будем иметь возможность сравнивать между собой отдельные запуски для выбора наиболее оптимального.
+![img_2.png](img_2.png)
+
+При этом в удаленном хранилище будут записаны обучающие данные, `.pkl` модели и `.json` метрики. 
+Артефакты с каждого прогона сохранены под своим собственным `md5` хэшом.
+![img_3.png](img_3.png)
+
+При этом `md5` хэши для каждого эксперимента будут доступны в файле `dvc.lock`, который обновляется после каждого нового
+эксперимента. Его мы тоже логируем в MLFlow, что дает нам возможность всегда иметь ссылку на состояние пайплайна
+в каждом эксперименте.
+
+```
+schema: '2.0'  
+stages:  
+  train:  
+    cmd: python train_pipeline.py --config configs/train_config.yaml  
+    deps:  
+    - path: configs/train_config.yaml  
+      hash: md5  
+      md5: 37cbcef657312c588f872fae924d1c26  
+      size: 969  
+    - path: data/raw/  
+      hash: md5  
+      md5: 75f77c6ca378b83b4d199c58e68d213f.dir  
+      size: 1762301353  
+      nfiles: 8  
+    outs:  
+    - path: models/catclf.pkl  
+      hash: md5  
+      md5: bef120e799a37fc607c97ec475285368  
+      size: 37030  
+    - path: models/metrics.json  
+      hash: md5  
+      md5: 7cac56ee734d1e973b3a13c392cd15e8  
+      size: 167
+```
+
+![img_4.png](img_4.png)
+
+
+
+
+
+## Организация проекта
+```
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
@@ -87,8 +180,6 @@ pytest
     │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
-
---------
+```
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
