@@ -1,0 +1,43 @@
+import logging
+import sys
+from time import sleep
+
+import numpy as np
+import pandas as pd
+import requests
+
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(sys.stdout)
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+
+
+dataset_path = "data/raw/sampled_preprocessed_train_50k.csv"
+
+
+def read_data(path: str) -> pd.DataFrame:
+    return pd.read_csv(path)
+
+
+if __name__ == "__main__":
+    data = read_data(dataset_path)
+
+    for i in range(10):
+        request_data = [
+            x.item() if isinstance(x, np.generic) else x for x in data.iloc[i].tolist()
+        ]
+        print("check np.generic: ", np.generic)
+        print("check request_data: ", request_data)
+        print("check data.columns: ", list(data.columns))
+        print("types: ", [type(x) for x in request_data])
+
+        response = requests.get(
+            "http://0.0.0.0:8000/predict/",
+            json={"data": [request_data], "features": list(data.columns)},
+        )
+
+        # server is working, can see output
+        print("check response.status_code: ", response.status_code)
+        print("check response.json(): ", response.json())
+
+        sleep(1)

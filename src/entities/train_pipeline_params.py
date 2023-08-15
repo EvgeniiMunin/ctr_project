@@ -23,11 +23,14 @@ PATH = "../configs/train_config.yaml"
 class TrainingPipelineParams:
     output_model_path: str
     output_transformer_path: str
+    output_ctr_transformer_path: str
     metric_path: str
     splitting_params: SplittingParams
     feature_params: FeatureParams
     train_params: TrainingParams
     input_data_path: str = field(default="../data/raw/sampled_train_5m.csv")
+    use_mlflow: bool = False
+    mlflow_experiment: str = "inference_demo"
 
 
 TrainingPipelineParamsSchema = class_schema(TrainingPipelineParams)
