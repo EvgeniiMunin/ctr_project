@@ -26,10 +26,8 @@ if __name__ == "__main__":
         request_data = [
             x.item() if isinstance(x, np.generic) else x for x in data.iloc[i].tolist()
         ]
-        print("check np.generic: ", np.generic)
         print("check request_data: ", request_data)
         print("check data.columns: ", list(data.columns))
-        print("types: ", [type(x) for x in request_data])
 
         response = requests.get(
             "http://0.0.0.0:8000/predict/",
@@ -38,6 +36,6 @@ if __name__ == "__main__":
 
         # server is working, can see output
         print("check response.status_code: ", response.status_code)
-        print("check response.json(): ", response.json())
+        print("check response.json(): ", response.json(), "\n")
 
         sleep(1)

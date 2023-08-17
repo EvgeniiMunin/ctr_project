@@ -32,7 +32,7 @@ def interpret_features(model, val_features):
 
     plt.subplots(nrows=1, ncols=1)
     shap.summary_plot(shap_values, tempdf, plot_size=(12, 8), show=False)
-    plt.savefig(f"artifacts/shap.png")
+    plt.savefig("artifacts/shap.png")
 
 
 def log_experiment_mlflow(
