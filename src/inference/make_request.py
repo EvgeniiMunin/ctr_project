@@ -26,16 +26,16 @@ if __name__ == "__main__":
         request_data = [
             x.item() if isinstance(x, np.generic) else x for x in data.iloc[i].tolist()
         ]
-        print("check request_data: ", request_data)
-        print("check data.columns: ", list(data.columns))
+        logger.info(f"check request_data: {request_data}")
+        logger.info(f"check data.columns: {list(data.columns)}")
 
-        response = requests.get(
+        response = requests.post(
             "http://0.0.0.0:8000/predict/",
             json={"data": [request_data], "features": list(data.columns)},
         )
 
         # server is working, can see output
-        print("check response.status_code: ", response.status_code)
-        print("check response.json(): ", response.json(), "\n")
+        logger.info(f"check response.status_code: {response.status_code}")
+        logger.info(f"check response.json(): {response.json()}\n")
 
         sleep(1)
