@@ -1,4 +1,5 @@
 input_data_path: "data/raw/sampled_train_50k.csv"
+input_preprocessed_data_path: "data/raw/sampled_preprocessed_train_50k.csv"
 output_model_path: "models/catclf.pkl"
 output_transformer_path: "models/transformer.pkl"
 output_ctr_transformer_path: "models/ctr_transformer.pkl"

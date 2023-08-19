@@ -16,6 +16,12 @@ logger.addHandler(handler)
 client = TestClient(app)
 
 
+def test_read_main():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == "it is entry point of our predictor"
+
+
 def test_inference_model(processed_dataset_path: str):
     data = read_data(processed_dataset_path)
     request_data = [
