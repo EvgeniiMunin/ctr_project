@@ -55,7 +55,7 @@ def evaluate_model(
     }
 
 
-def serialize_model(model: CatBoostClassifier, output: str) -> str:
+def serialize_model(model, output: str) -> str:
     """Serialize model from configs"""
     with open(output, "wb") as file:
         joblib.dump(model, file)

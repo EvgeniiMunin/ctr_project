@@ -9,7 +9,7 @@ ctr_project
 За основу возьмем данные соревнования Kaggle [Avazu CTR Prediction](https://www.kaggle.com/competitions/avazu-ctr-prediction/overview/description).
 
 
-## Sem1. ML Pipeline
+## Sem2. ML Pipeline
 ### Описание пайплайна
 Пайплайн с моделью состоит из трех основных элементов
 - `make_dataset`: чтения данных
@@ -48,8 +48,9 @@ pytest
 ![img_5.png](img_5.png)
 
 
-## Sem2. Reproducibility
-В этом занятии мы затроним вопрос воспроизводимости экспериментов в ML. Рассмотрим 2 инструмента воспроизводимости экспериментов над моделями:
+## Sem3. Reproducibility
+В этом занятии мы затроним вопрос воспроизводимости экспериментов в ML. 
+Рассмотрим 2 инструмента воспроизводимости экспериментов над моделями:
 - [DVC](https://dvc.org/) : для версионирования данных и артефактов при помощи Git синтаксиса
 - [MLFlow](https://mlflow.org/): для логирования экспериментов над моделью.
 
@@ -131,7 +132,63 @@ stages:
 ![img_4.png](img_4.png)
 
 
+## Sem4. Inference
+В этом занятии мы рассмотрим, как обернуть обученную ранее модель в REST сервис. 
+Для этого нам познакомимся с [Fast API](https://fastapi.tiangolo.com/). 
+Также сделаем сервис доступным для запуска с любой машины, для этого мы соберем [Docker](https://www.docker.com/) образ
+и запустим его локально. Далее поднимем виртуальную машину на [VKCLoud](https://mcs.mail.ru/)
+и развернем сервис удаленно.
 
+
+### Установка 
+```bash
+pip install fastapi
+pip install unicorn
+apt install docker.io
+```
+
+### Основные команды
+```bash
+# run uvicron server
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+# build docker image
+docker build -t evgeniimunin/ctr_online_inference:v1 .
+
+# run fastapi app in docker container
+docker run -p 8000:8000 evgeniimunin/ctr_online_inference:v1
+
+# generate inference data on client side
+python src/inference/make_requests.py
+
+# push docker image to dcoker hub
+docker tag evgeniimunin/ctr_online_inference:v1 evgeniimunin/ctr_online_inference:v1
+docker push evgeniimunin/ctr_online_inference:v1
+```
+
+### Основные команды для запуска сервиса с удаленной машины
+```bash
+# resrict rights for .pem key pair VM access file
+chmod 400 your_key_pair.pem
+
+# connect to VM by SSH
+ssh -i your_key_pair.pem ubuntu@your_external_ip
+
+# pull docker image from docker hub
+docker pull evgeniimunin/ctr_online_inference:v1
+
+# run fastapi app in docker container
+docker run -p 8000:8000 evgeniimunin/ctr_online_inference:v1
+```
+
+### Результаты
+После написания REST сервиса на FastAPI мы можем его протестировать, отправив запросы на инференс.
+В качестве ответа мы получим код 200, означающий успешный ответ с сервера, а тело ответа будет содержать
+`device_ip` и предсказанную вероятность клика для данной сессии `click_proba`.
+```
+response.status_code: 200
+response.json(): [{'device_ip': '7061f023', 'click_proba': 0.2136}]
+```
 
 
 ## Организация проекта
