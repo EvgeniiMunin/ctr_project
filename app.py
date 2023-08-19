@@ -40,7 +40,6 @@ def main():
     return "it is entry point of our predictor"
 
 
-@app.on_event("startup")
 def load_models(training_pipeline_params: TrainingPipelineParams):
     model = joblib.load(training_pipeline_params.output_model_path)
     ctr_transformer = joblib.load(training_pipeline_params.output_ctr_transformer_path)
