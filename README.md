@@ -45,7 +45,7 @@ pytest
 Наш пайплайн будет достаточно прямолинейным и будет содержать элементы описанные ранее.
 Кастомные обработки фичей обернуты в формат `sklearn transformer` для единооборазия.
 
-![img_5.png](img_5.png)
+![img_5.png](imgs/img_5.png)
 
 
 ## Sem3. Reproducibility
@@ -87,17 +87,17 @@ dvc repro
 
 ### Результаты
 После прогона пайплайн у нас должна залогироваться их история в списке экспериметнов.
-![img.png](img.png)
+![img.png](imgs/img.png)
 
 В каждом эксперименте будет записан свой список метрик, параметров модели и артефактов.
-![img_1.png](img_1.png)
+![img_1.png](imgs/img_1.png)
 
 Мы будем иметь возможность сравнивать между собой отдельные запуски для выбора наиболее оптимального.
-![img_2.png](img_2.png)
+![img_2.png](imgs/img_2.png)
 
 При этом в удаленном хранилище будут записаны обучающие данные, `.pkl` модели и `.json` метрики. 
 Артефакты с каждого прогона сохранены под своим собственным `md5` хэшом.
-![img_3.png](img_3.png)
+![img_3.png](imgs/img_3.png)
 
 При этом `md5` хэши для каждого эксперимента будут доступны в файле `dvc.lock`, который обновляется после каждого нового
 эксперимента. Его мы тоже логируем в MLFlow, что дает нам возможность всегда иметь ссылку на состояние пайплайна
@@ -129,7 +129,7 @@ stages:
       size: 167
 ```
 
-![img_4.png](img_4.png)
+![img_4.png](imgs/img_4.png)
 
 
 ## Sem4. Inference
@@ -189,6 +189,71 @@ docker run -p 8000:8000 evgeniimunin/ctr_online_inference:v1
 response.status_code: 200
 response.json(): [{'device_ip': '7061f023', 'click_proba': 0.2136}]
 ```
+
+
+## Sem6. Monitoring
+В этом занятии мы рассмотрим, как настроить мониторинг REST сервиса на инференсе. 
+В качестве инструментов мы воспользуемся
+- [Grafana](https://grafana.com/): инструмент для визуализации метрик
+- [Prometheus](https://prometheus.io/): система мониторинга которая будет собирать метрики у приложения 
+и передавать их в Grafana
+
+### Установка
+Для передачи метрик в Prometheus нам понадобятся библиотеки
+- [prometheus-fastapi-instrumentator](https://github.com/trallnag/prometheus-fastapi-instrumentator), чтобы Prometheus знал endpoint `/metrics`, откуда забирать метрики.
+- [prometheus-client](https://github.com/prometheus/client_python) для определения метрик.
+
+В качестве метрик выведем:
+- `predict_proba`: значение вероятности клика с каждого предсказания
+- `predicted_proba_hist`: гистограмма вероятностей
+- `http_predict_request_total`: счетчик входящих запросов на endpoint `/predict`
+
+Для настройки Prometheus мы пропишем конфиг, 
+где среди прочего укажем расписание сбора метрик по endpoint'у `localhost:8000/metrics`.
+
+```yml
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 4s
+    metrics_path: /metrics
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+        - localhost:9090
+
+  - job_name: 'fastapi-app'
+    scrape_interval: 5s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['app:8000']
+```
+
+Для работы нам будет необходимо поднять docker образы приложения, Prometheus, grafana.
+Делать мы это будем с помощью `docker-compose`.
+
+```bash
+docker compose up
+```
+
+### Результаты
+После сборки образов и запуска контейнеров мы можем обратиться к серверу Prometheus 
+по адресу `localhost:9090`. В поле выбора метрик 
+мы сможем увидеть введенные нами метрики и их текущие занчения.
+![img_3.png](imgs/img_sem6_3.png)
+
+Далее по адресу `localhost:9090/targets` мы сможем проверить endpoint, 
+с которого Prometheus забирает метрики и его статус UP.
+![img.png](imgs/img_sem6.png)
+
+Grafana будет доступна по адресу `localhost:3000`. После создания datasource Prometheus
+мы сможем создать дашборд, куда и вынесем необходимые метрики.
+![img_1.png](imgs/img_sem6_1.png)
 
 
 ## Организация проекта

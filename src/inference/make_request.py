@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     data = read_data(training_pipeline_params.input_preprocessed_data_path)
 
-    for i in range(10):
+    for i in range(100):
         request_data = [
             x.item() if isinstance(x, np.generic) else x for x in data.iloc[i].tolist()
         ]
@@ -32,11 +32,12 @@ if __name__ == "__main__":
         logger.info(f"check data.columns: {list(data.columns)}")
 
         response = requests.post(
-            "http://213.219.215.18:8000/predict/",
+            # "http://213.219.215.18:8000/predict/",
+            "http://localhost:8000/predict/",
             json={"data": [request_data], "features": list(data.columns)},
         )
 
         logger.info(f"check response.status_code: {response.status_code}")
         logger.info(f"check response.json(): {response.json()}\n")
 
-        sleep(1)
+        sleep(4)
