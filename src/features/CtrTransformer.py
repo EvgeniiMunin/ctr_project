@@ -11,6 +11,10 @@ logger.setLevel(logging.INFO)
 
 
 class CtrTransformer(BaseEstimator, TransformerMixin):
+    """
+    Pipeline feature transformer for CTR computation
+    """
+
     def __init__(self, features: list = None):
         self.ctr_df = None
         self.mean_ctr = dict()
@@ -18,12 +22,15 @@ class CtrTransformer(BaseEstimator, TransformerMixin):
         self.features = features
 
     def _response_fit(self, data, feature_name):
+        # group data on each cat feature
         df_vocab = data.groupby([feature_name, "click"]).size().unstack()
         df_vocab["ctr"] = df_vocab[1] / (df_vocab[0] + df_vocab[1])
 
+        # drop nans and compute avg CTR
         df_vocab.dropna(inplace=True)
         mean_ctr = df_vocab["ctr"].mean()
 
+        # prepare dictionary for further transform
         keys = list(df_vocab.index)
         values = list(df_vocab["ctr"].values)
         vocab = {keys[i]: values[i] for i in range(len(keys))}

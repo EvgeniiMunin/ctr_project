@@ -39,14 +39,14 @@ def train_pipeline(config_path: str):
 
     data: pd.DataFrame = read_data(training_pipeline_params.input_data_path)
     data["hour"] = data.hour.apply(lambda val: datetime.strptime(str(val), "%y%m%d%H"))
-    logger.info(f"Start train pipeline with params {training_pipeline_params}")
-    logger.info(f"data:  {data.shape} \n {data.info()} \n {data.nunique()}")
+    logger.debug(f"Start train pipeline with params {training_pipeline_params}")
+    logger.debug(f"data:  {data.shape} \n {data.info()} \n {data.nunique()}")
 
     transformer = build_transformer()
     processed_data = process_count_features(
         transformer, data, training_pipeline_params.feature_params
     )
-    logger.info(
+    logger.debug(
         f"processed_data:  {processed_data.shape} \n {processed_data.info()} "
         f"\n {processed_data.nunique()} \n {processed_data[training_pipeline_params.feature_params.count_features]}"
     )
@@ -54,8 +54,8 @@ def train_pipeline(config_path: str):
     train_df, val_df = split_train_val_data(
         processed_data, training_pipeline_params.splitting_params
     )
-    logger.info(f"train_df.shape is  {train_df.shape}")
-    logger.info(f"val_df.shape is  {val_df.shape}")
+    logger.debug(f"train_df.shape is  {train_df.shape}")
+    logger.debug(f"val_df.shape is  {val_df.shape}")
 
     # check distributions of targets between train and test
     logger.info(f"train trg: \n {train_df['click'].value_counts() / train_df.shape[0]}")
@@ -63,30 +63,39 @@ def train_pipeline(config_path: str):
 
     ctr_transformer = build_ctr_transformer(training_pipeline_params.feature_params)
     ctr_transformer.fit(train_df)
-    logger.info(f"mean_ctr: {ctr_transformer.mean_ctr}")
+    logger.debug(f"mean_ctr: {ctr_transformer.mean_ctr}")
 
     # prepare train features
     train_features = ctr_transformer.transform(train_df)
     train_target = extract_target(train_df, training_pipeline_params.feature_params)
-    logger.info(
+    logger.debug(
         f"train_features:  {train_features.shape} \n {train_features.info()} \n {train_features.nunique()}"
     )
 
     # prepare val features
     val_features = ctr_transformer.transform(val_df)
     val_target = extract_target(val_df, training_pipeline_params.feature_params)
-    logger.info(
+    logger.debug(
         f"val_features:  {val_features.shape} \n {val_features.info()} \n {val_features.nunique()}"
     )
 
-    model, metrics = log_experiment_mlflow(
-        run_name="ctr_run_50k_150estim",
-        train_features=train_features,
-        train_target=train_target,
-        val_features=val_features,
-        val_target=val_target,
-        training_pipeline_params=training_pipeline_params,
-    )
+    if training_pipeline_params.use_mlflow:
+        model, metrics = log_experiment_mlflow(
+            run_name="ctr_run_50k_150estim",
+            train_features=train_features,
+            train_target=train_target,
+            val_features=val_features,
+            val_target=val_target,
+            training_pipeline_params=training_pipeline_params,
+        )
+    else:
+        model = train_model(
+            train_features, train_target, training_pipeline_params.train_params
+        )
+
+        predicted_proba, preds = predict_model(model, val_features)
+        metrics = evaluate_model(predicted_proba, preds, val_target)
+        logger.debug(f"preds/ targets shapes:  {(preds.shape, val_target.shape)}")
 
     # dump metrics to json
     with open(training_pipeline_params.metric_path, "w") as metric_file:
@@ -94,9 +103,10 @@ def train_pipeline(config_path: str):
     logger.info(f"Metric is {metrics}")
 
     # serialize model
-    path_to_model = serialize_model(model, training_pipeline_params.output_model_path)
-
-    return path_to_model, metrics
+    serialize_model(model, training_pipeline_params.output_model_path)
+    serialize_model(
+        ctr_transformer, training_pipeline_params.output_ctr_transformer_path
+    )
 
 
 if __name__ == "__main__":
