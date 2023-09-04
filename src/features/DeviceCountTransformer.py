@@ -11,6 +11,11 @@ logger.addHandler(handler)
 
 
 class DeviceCountTransformer(BaseEstimator, TransformerMixin):
+    """
+    Pipeline feature transformer for device count computation
+    Should be applied on columns  device_ip, device_id
+    """
+
     def __init__(self, column_name: str):
         self.device_count_feature = []
         self.column_name = column_name

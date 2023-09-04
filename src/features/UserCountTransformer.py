@@ -12,6 +12,11 @@ logger.addHandler(handler)
 
 
 class UserCountTransformer(BaseEstimator, TransformerMixin):
+    """
+    Pipeline feature transformer to count users per hour
+    Should be applied after computation of hour features
+    """
+
     def __init__(self):
         self.user_count_feature = []
 

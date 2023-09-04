@@ -15,3 +15,4 @@ ENV PATH_TO_MODEL="models/model.pkl"
 ENV PATH_TO_CTR_TRANSFORMER="models/ctr_transformer.pkl"
 
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
