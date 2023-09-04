@@ -17,6 +17,17 @@ logger.addHandler(handler)
 
 
 def build_transformer() -> Pipeline:
+    """
+    Build pipeline feature transformer consisting of
+    time_transformer
+    device_trnasformer
+    user_count_transformer
+
+    param:
+    return:
+        pipeline: Pipeline
+    """
+
     time_transformer = FunctionTransformer(
         lambda df: pd.DataFrame(
             {
@@ -59,6 +70,14 @@ def build_transformer() -> Pipeline:
 
 
 def build_ctr_transformer(params: FeatureParams) -> CtrTransformer:
+    """
+    Build pipeline feature transformer for CTR computation
+    param:
+        params: FeatureParams: list of features to process
+    return:
+        ctr_transformer: CtrTransformer
+    """
+
     feature_names = params.ctr_features
     ctr_transformer = CtrTransformer(feature_names)
     logger.info(f"ctr_transformer: \n {ctr_transformer}")
@@ -69,6 +88,16 @@ def build_ctr_transformer(params: FeatureParams) -> CtrTransformer:
 def process_count_features(
     transformer: Pipeline, df: pd.DataFrame, params: FeatureParams = None,
 ) -> pd.DataFrame:
+    """
+    Apply the count_transformer on dataframe
+    param:
+        transformer: Pipeline: count_transformer
+        df: pd.DataFrame: input df
+        params: FeatureParams: list of features to process
+    return:
+        pd.DataFrame: dataframe with processed features
+    """
+
     counts_df = transformer.fit_transform(df)
     return pd.concat([df, counts_df[params.count_features]], axis=1)
 
