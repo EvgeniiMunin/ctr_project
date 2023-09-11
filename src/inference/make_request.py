@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     data = read_data(training_pipeline_params.input_preprocessed_data_path)
 
-    for i in range(100):
+    for i in range(10):
         request_data = [
             x.item() if isinstance(x, np.generic) else x for x in data.iloc[i].tolist()
         ]
@@ -40,4 +40,4 @@ if __name__ == "__main__":
         logger.info(f"check response.status_code: {response.status_code}")
         logger.info(f"check response.json(): {response.json()}\n")
 
-        sleep(4)
+        sleep(1)
