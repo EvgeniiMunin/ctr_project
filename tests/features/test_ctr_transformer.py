@@ -11,7 +11,6 @@ handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
-
 @pytest.fixture(scope="function")
 def synthetic_dataset() -> Tuple[pd.DataFrame, list]:
     data = pd.DataFrame(
