@@ -33,7 +33,8 @@ if __name__ == "__main__":
 
         response = requests.post(
             # "http://213.219.215.18:8000/predict/",
-            "http://localhost:8000/predict/",
+            "http://0.0.0.0:8000/predict/",
+            #"http://3.147.55.220:8000/predict/",
             json={"data": [request_data], "features": list(data.columns)},
         )
 
